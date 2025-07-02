@@ -1,5 +1,6 @@
 package com.pjlaapps.estudobiblicoeespiritodeprofecia
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -7,7 +8,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pjlaapps.estudobiblicoeespiritodeprofecia.ui.theme.EstudoBiblicoEEspiritoDeProfeciaTheme
@@ -15,7 +21,16 @@ import com.pjlaapps.estudobiblicoeespiritodeprofecia.ui.theme.EstudoBiblicoEEspi
 
 // criar tela com doze botões, cada um com o nome de um mês do ano
 @Composable
-fun MonthButtonsScreen() {
+fun MonthButtonsScreen(
+    dataStoreManager: DataStoreManager,
+    onItemClick: (String) -> Unit
+) {
+
+    //todo usar datastore e armazenar o mes de referencia
+    //todo cada botao do mes a ser clicado deve ser passado ao dia de estudo
+    //todo quando todos os dias ficarem verdes, o mes também vai pra verde
+    //todo colocar botão de resetar também aqui
+
     Column {
         Text(
             "Clique em um mês para ver os estudos disponíveis",
@@ -65,8 +80,17 @@ fun MonthButtonsScreen() {
 
 @Preview(showBackground = true)
 @Composable
-fun MonthButtonsScreenPreview() {
+fun MonthButtonsScreenPreview( context: Context = LocalContext.current) {
+    val dataStoreManager = DataStoreManager(context)
     EstudoBiblicoEEspiritoDeProfeciaTheme {
-        MonthButtonsScreen()
+        var currentScreen by remember { mutableStateOf("main") }
+        var selectedMonthIndex by remember { mutableStateOf("JAN") }
+        MonthButtonsScreen(
+            dataStoreManager,
+            onItemClick = {
+                selectedMonthIndex = it
+                currentScreen = "detail"
+            }
+        )
     }
 }

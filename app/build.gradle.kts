@@ -57,5 +57,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3") // versão atual até jun/2025
+    // Kotlin e Compose
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.compose.ui:ui:1.6.7")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.activity:activity-compose:1.9.0")
 
+    // Animações
+    implementation("androidx.compose.animation:animation:1.6.7")
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // (Opcional) Preview e tooling
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.7")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.7")
 }
