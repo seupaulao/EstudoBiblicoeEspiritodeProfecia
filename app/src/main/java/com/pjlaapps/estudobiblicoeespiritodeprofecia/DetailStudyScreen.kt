@@ -32,12 +32,15 @@ import kotlinx.coroutines.launch
 fun DetailStudyScreen(
     dataStoreManager: DataStoreManager,
     index: Int,
+    mes: String,
     onBack: () -> Unit,
     onReadBible: (String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var clickedA by remember { mutableStateOf(false) }
     var clickedB by remember { mutableStateOf(false) }
+    //todo capturar a referencia da biblia que deve ser lida atraves do indice do dia de estudo
+    var deveSerLidoBiblia by remember { mutableStateOf("GEN_1") }
 
     LaunchedEffect(true) {
         dataStoreManager.getButtonStates().collect { states ->
@@ -68,7 +71,7 @@ fun DetailStudyScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Item ${index + 1}", style = MaterialTheme.typography.headlineSmall)
-        //algum botão aqui cuidara de abrir o BibleStudyScreen
+        
         Button(
             onClick = {
                 clickedA = !clickedA
@@ -94,7 +97,10 @@ fun DetailStudyScreen(
         ) {
             Text("Botão B", color = Color.White)
         }
-
+        Spacer(modifier = Modifier.height(40.dp))
+        Button(onClick = { onReadBible(deveSerLidoBiblia) }) {
+            Text("Ir na Biblia")
+        }
         Spacer(modifier = Modifier.height(40.dp))
         Button(onClick = onBack) {
             Text("Voltar")
@@ -111,11 +117,13 @@ fun DetailStudyScreenPreview(
 
         var currentScreen by remember { mutableStateOf("main") }
         var selectedIndex by remember { mutableStateOf(-1) }
+        var mesIndex by remember { mutableStateOf("JAN") }
         var referenciaBiblia by remember { mutableStateOf("GEN_1") }
 
     DetailStudyScreen(
             dataStoreManager,
             selectedIndex,
+            mesIndex,
             onBack = {
                 currentScreen = "main"
             },
