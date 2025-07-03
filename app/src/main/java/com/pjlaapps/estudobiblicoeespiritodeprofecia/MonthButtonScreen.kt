@@ -8,14 +8,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pjlaapps.botoescomlista.getMesPorSigla
 import com.pjlaapps.estudobiblicoeespiritodeprofecia.ui.theme.EstudoBiblicoEEspiritoDeProfeciaTheme
 
 
@@ -44,13 +41,14 @@ fun MonthButtonsScreen(
 
                         // Cria um botão para cada mês
                         months.forEach { month ->
+                            val nomeMes = getMesPorSigla(month)
                             Button(
                                 modifier = Modifier
                                     .padding(8.dp)
                                     .weight(1f),
-                                onClick = { /* Ação ao clicar no botão */ }
+                                onClick = { onItemClick(month) },
                             ) {
-                                Text(text = month)
+                                Text(text = nomeMes)
                             }
                         }
                     }
@@ -58,16 +56,16 @@ fun MonthButtonsScreen(
             }
 
             LinhaMeses(listOf(
-                "Janeiro", "Fevereiro", "Março"
+                "JAN", "FEV", "MAR"
             ))
             LinhaMeses(listOf(
-                "Abril", "Maio", "Junho"
+                "ABR", "MAI", "JUN"
             ))
             LinhaMeses(listOf(
-                "Julho", "Agosto", "Setembro"
+                "JUL", "AGO", "SET"
             ))
             LinhaMeses(listOf(
-                "Outubro", "Novembro", "Dezembro"
+                "OUT", "NOV", "DEZ"
             ))
 
 
@@ -83,13 +81,13 @@ fun MonthButtonsScreen(
 fun MonthButtonsScreenPreview( context: Context = LocalContext.current) {
     val dataStoreManager = DataStoreManager(context)
     EstudoBiblicoEEspiritoDeProfeciaTheme {
-        var currentScreen by remember { mutableStateOf("main") }
-        var selectedMonthIndex by remember { mutableStateOf("JAN") }
+//        var currentScreen by remember { mutableStateOf("main") }
+//        var selectedMonthIndex by remember { mutableStateOf("JAN") }
         MonthButtonsScreen(
             dataStoreManager,
             onItemClick = {
-                selectedMonthIndex = it
-                currentScreen = "detail"
+//                selectedMonthIndex = it
+//                currentScreen = "days"
             }
         )
     }

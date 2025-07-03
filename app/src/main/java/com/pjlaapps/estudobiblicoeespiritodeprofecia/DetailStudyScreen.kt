@@ -1,6 +1,5 @@
 package com.pjlaapps.estudobiblicoeespiritodeprofecia
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,11 +22,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pjlaapps.estudobiblicoeespiritodeprofecia.ui.theme.EstudoBiblicoEEspiritoDeProfeciaTheme
+import com.pjlaapps.botoescomlista.getCapituloESPorReferencia
+import com.pjlaapps.botoescomlista.getCapituloLeituraPorReferencia
+import com.pjlaapps.botoescomlista.getRefsPorReferencia
+import com.pjlaapps.botoescomlista.getSiglaESPorReferencia
+import com.pjlaapps.botoescomlista.getTituloCapituloESPorReferencia
+import com.pjlaapps.botoescomlista.getTituloLivroPorSigla
+import com.pjlaapps.botoescomlista.getUrlPorSigla
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun DetailStudyScreen(
@@ -40,7 +46,14 @@ fun DetailStudyScreen(
     var clickedA by remember { mutableStateOf(false) }
     var clickedB by remember { mutableStateOf(false) }
     //todo capturar a referencia da biblia que deve ser lida atraves do indice do dia de estudo
-    var deveSerLidoBiblia by remember { mutableStateOf("GEN_1") }
+    val chave = mes + "_" + (index + 1).toString()
+    val refsBiblia = getRefsPorReferencia(chave)
+    val capitulosBiblia = getCapituloLeituraPorReferencia(chave)
+    val capitulosEP = getCapituloESPorReferencia(chave)
+    val siglaEP = getSiglaESPorReferencia(chave)
+    val tituloEP = getTituloCapituloESPorReferencia(chave)
+    val tituloLivroEP = getTituloLivroPorSigla(siglaEP)
+    val urlLivroEP = getUrlPorSigla(siglaEP)
 
     LaunchedEffect(true) {
         dataStoreManager.getButtonStates().collect { states ->
@@ -98,7 +111,7 @@ fun DetailStudyScreen(
             Text("Botão B", color = Color.White)
         }
         Spacer(modifier = Modifier.height(40.dp))
-        Button(onClick = { onReadBible(deveSerLidoBiblia) }) {
+        Button(onClick = { onReadBible(refsBiblia) }) {
             Text("Ir na Biblia")
         }
         Spacer(modifier = Modifier.height(40.dp))
@@ -108,28 +121,30 @@ fun DetailStudyScreen(
     }
 }
 
+class FakeDataStoreManager : DataStoreManager(null) {
+    override fun getButtonStates() = kotlinx.coroutines.flow.flowOf(List(31) { 0 })
+    override suspend fun saveButtonState(index: Int, state: Int) { /* no-op */ }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DetailStudyScreenPreview(
-    context: Context = LocalContext.current
-) {
-    val dataStoreManager = DataStoreManager(context)
 
-        var currentScreen by remember { mutableStateOf("main") }
-        var selectedIndex by remember { mutableStateOf(-1) }
+) {
+    val fakeDataStoreManager = remember { FakeDataStoreManager() }
+
+
+
+
+        var selectedIndex by remember { mutableIntStateOf(-1) }
         var mesIndex by remember { mutableStateOf("JAN") }
-        var referenciaBiblia by remember { mutableStateOf("GEN_1") }
+
 
     DetailStudyScreen(
-            dataStoreManager,
+            dataStoreManager = fakeDataStoreManager,
             selectedIndex,
             mesIndex,
-            onBack = {
-                currentScreen = "main"
-            },
-            onReadBible =  {
-                referenciaBiblia = "GEN_1"
-                currentScreen = "bible"
-            }
+            onBack = { },
+            onReadBible =  { }
         );
 }

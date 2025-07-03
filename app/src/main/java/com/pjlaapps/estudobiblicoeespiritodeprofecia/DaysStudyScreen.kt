@@ -4,30 +4,36 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pjlaapps.botoescomlista.getMesPorSigla
+import com.pjlaapps.botoescomlista.getNumeroDiasMes
 import com.pjlaapps.estudobiblicoeespiritodeprofecia.ui.theme.EstudoBiblicoEEspiritoDeProfeciaTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun DaysStudyScreen(
     dataStoreManager: DataStoreManager,
-    onItemClick: (Int) -> Unit
+    mes: String = "JAN", // Default month, can be changed
+    onItemClick: (Int, String) -> Unit
 ) {
-    val mes = arrayOf("JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ");
-    val nomemes = arrayOf("JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO",
-        "JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO");
-    val qmes = intArrayOf(31,28,31,30,31,30,31,31,30,31,30,31);
+
     val scope = rememberCoroutineScope()
+    val numeroDiasDoMes = getNumeroDiasMes(mes)
+    val nomeMes = getMesPorSigla(mes)
     //todo o numero do estado varia com o mes que deve vir por parametro
-    val states by dataStoreManager.getButtonStates().collectAsState(initial = List(30) { 0 })
+    val states by dataStoreManager.getButtonStates().collectAsState(initial = List(numeroDiasDoMes) { 0 })
 
     Column(modifier = Modifier.padding(16.dp)) {
         Button(
@@ -39,31 +45,43 @@ fun DaysStudyScreen(
             Text("Resetar Todos")
         }
 
-        LazyColumn {
 
-            items(30) { index ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    nomeMes,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            items(numeroDiasDoMes) { index ->
                 val color = when (states[index]) {
                     3 -> Color.Green
-                    2 -> Color.Yellow
-                    1 -> Color.Yellow
+                    2, 1 -> Color.Yellow
                     else -> Color.Red
                 }
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
                         .height(50.dp)
                         .background(color)
-                        .clickable { onItemClick(index) },
+                        .clickable { onItemClick(index, mes) },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Item ${index + 1}", color = Color.White)
+                    Text("${index + 1}", color = Color.White)
                 }
-
             }
-
-            }
+        }
 
     }
 }
@@ -76,13 +94,15 @@ fun DaysStudyScreenPreview(
     val dataStoreManager = DataStoreManager(context)
 
     EstudoBiblicoEEspiritoDeProfeciaTheme {
-        var currentScreen by remember { mutableStateOf("main") }
-        var selectedIndex by remember { mutableStateOf(-1) }
+        //var currentScreen by remember { mutableStateOf("main") }
+       // var selectedIndex by remember { mutableStateOf(-1) }
         DaysStudyScreen(
             dataStoreManager,
-            onItemClick = {
-            selectedIndex = it
-            currentScreen = "detail"
-        } );
+            "FEV",
+            onItemClick = { index, mes ->;
+                //currentScreen = "detail"
+                //selectedIndex = index
+                // Handle item click here, e.g., navigate to detail screen
+            })
     }
 }

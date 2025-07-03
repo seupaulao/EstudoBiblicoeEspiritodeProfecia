@@ -3,6 +3,7 @@ package com.pjlaapps.botoescomlista
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.util.Locale
 
 
 val livrosstring = """
@@ -25,38 +26,38 @@ val urllivros = """{"PP": "https://ellenwhiteaudio.org/pt/patriarcas-e-profetas/
 "DTN": "https://ellenwhiteaudio.org/pt/desejado-de-todas-as-nacoes/",
 "PJ": "https://ellenwhiteaudio.org/pt/parabolas-de-jesus/",
 "GC": "https://ellenwhiteaudio.org/pt/grande-conflito/"}"""
-
-val listaA = listOf("No princípio",
-    "criou Deus", "os céus e a Terra",
-    "E a Terra era sem forma e vazia",
-    "e o Espírito de Deus pairava sobre a face das águas",
-    "E disse Deus: Haja luz, e houve luz",
-    "e viu Deus que era boa a luz",
-    "E fez Deus separação entre a luz e as trevas",
-    "E chamou Deus à luz Dia, e às trevas chamou Noite",
-    "E foi a tarde e a manhã, o dia primeiro",
-    "E disse Deus: Haja uma expansão no meio das águas",
-    "e haja separação entre águas e águas",
-    "E fez Deus a expansão, e separou as águas que estavam debaixo da expansão",
-    "das águas que estavam sobre a expansão",
-    "E assim foi",
-    "E chamou Deus à expansão Céus",
-    "E foi a tarde e a manhã, o dia segundo",
-    "E disse Deus: Ajuntem-se as águas debaixo dos céus num lugar",
-    "e apareça a porção seca",
-    "E assim foi",
-    "E chamou Deus à porção seca Terra",
-    "e ao ajuntamento das águas chamou Mares",
-    "E viu Deus que era bom",
-    "E disse Deus: Produza a Terra relva, ervas que deem semente",)
-
-val listaB = listOf(
-    "Bem-aventurados os que choram porque serão consolados",
-    "Bem-aventurados os misericordiosos porque alcançarão a misericórdia",
-    "Bem-aventurados os limpos de coração porque verão a Deus",
-    "Bem-aventurados os pacificadores porque serão chamados filhos de Deus",
-    "Bem-aventurados os perseguidos por causa da justiça porque deles é o Reino dos céus",
-)
+//
+//val listaA = listOf("No princípio",
+//    "criou Deus", "os céus e a Terra",
+//    "E a Terra era sem forma e vazia",
+//    "e o Espírito de Deus pairava sobre a face das águas",
+//    "E disse Deus: Haja luz, e houve luz",
+//    "e viu Deus que era boa a luz",
+//    "E fez Deus separação entre a luz e as trevas",
+//    "E chamou Deus à luz Dia, e às trevas chamou Noite",
+//    "E foi a tarde e a manhã, o dia primeiro",
+//    "E disse Deus: Haja uma expansão no meio das águas",
+//    "e haja separação entre águas e águas",
+//    "E fez Deus a expansão, e separou as águas que estavam debaixo da expansão",
+//    "das águas que estavam sobre a expansão",
+//    "E assim foi",
+//    "E chamou Deus à expansão Céus",
+//    "E foi a tarde e a manhã, o dia segundo",
+//    "E disse Deus: Ajuntem-se as águas debaixo dos céus num lugar",
+//    "e apareça a porção seca",
+//    "E assim foi",
+//    "E chamou Deus à porção seca Terra",
+//    "e ao ajuntamento das águas chamou Mares",
+//    "E viu Deus que era bom",
+//    "E disse Deus: Produza a Terra relva, ervas que deem semente",)
+//
+//val listaB = listOf(
+//    "Bem-aventurados os que choram porque serão consolados",
+//    "Bem-aventurados os misericordiosos porque alcançarão a misericórdia",
+//    "Bem-aventurados os limpos de coração porque verão a Deus",
+//    "Bem-aventurados os pacificadores porque serão chamados filhos de Deus",
+//    "Bem-aventurados os perseguidos por causa da justiça porque deles é o Reino dos céus",
+//)
 
 //val urlellenwhite = "https://ellenwhiteaudio.org/pt/ebooks-egw/";
 
@@ -464,6 +465,24 @@ val planosstring = """
    }
 """.trimIndent()
 
+fun getMesPorSigla(sigla: String): String {
+    val mes = arrayOf("JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ");
+    val nomemes = arrayOf("JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO",
+    "JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO");
+    val index = mes.indexOf(sigla.uppercase(Locale.getDefault()))
+    return if (index != -1) nomemes[index] else "Mês não encontrado"
+}
+
+fun getNumeroDiasMes(sigla: String): Int {
+    val mes = sigla.uppercase(Locale.getDefault())
+    return when (mes) {
+        "JAN", "MAR", "MAI", "JUL", "AGO", "OUT", "DEZ" -> 31
+        "FEV" -> 28 // Considerando anos não bissextos
+        "ABR", "JUN", "SET", "NOV" -> 30
+        else -> -1 // Mês inválido
+    }
+}
+
 fun getTituloLivroPorSigla(sigla: String): String {
     val mapa: Map<String, String> = Json.decodeFromString(livrosstring)
     val valor = mapa[sigla] ?: "Livro não encontrado"
@@ -484,18 +503,6 @@ fun getUrlPorSigla(sigla: String): String {
 
 fun getPosicaoPorSigla(sigla: String): Int {
     return livros_biblia_refs.indexOf(sigla)
-}
-
-fun getNomeLivroBibliaPorSigla(sigla: String): String {
-    val livro = livros_biblia[getPosicaoPorSigla(sigla)]
-    return livro
-}
-
-fun getTextoBiblicoFromJson(versiculo: String): String {
-    val jsonFile = File("res/blv.json").readText()
-    val mapa: Map<String, String> = Json.decodeFromString(jsonFile)
-    val valor = mapa[versiculo] ?: "Versículo não encontrado"
-    return valor
 }
 
 fun getRefsPorReferencia(dia: String): String {
@@ -533,6 +540,83 @@ fun getTituloCapituloESPorReferencia(dia: String): String {
     return valor
 }
 
+fun getNomeLivroBibliaPorSigla(sigla: String): String {
+    val livro = livros_biblia[getPosicaoPorSigla(sigla)]
+    return livro
+}
+
+fun getTextoBiblicoFromJson(versiculo: String): String {
+    val jsonFile = File("res/blv.json").readText()
+    val mapa: Map<String, String> = Json.decodeFromString(jsonFile)
+    val valor = mapa[versiculo] ?: "Versículo não encontrado"
+    return valor
+}
+
+fun getVersiculosPorReferencia(versiculos: String): List<String> {
+    val partes = versiculos.split(",")
+    val listaVersiculos = mutableListOf<String>()
+    for (parte in partes) {
+        val versiculo = parte.trim()
+        val versiculosList = getVersosFromReferenciaVersiculo(versiculo)
+        listaVersiculos.addAll(getTextoFromReferenciaVersiculos(versiculosList))
+    }
+    return listaVersiculos.toList()
+}
+
+fun getTextoFromReferenciaVersiculos(versos: List<String>): List<String> {
+    val listaVersiculos = mutableListOf<String>()
+    for (item in versos) {
+        val texto = getTextoBiblicoFromJson(item)
+        if (texto.isNotEmpty()) {
+            listaVersiculos.add(texto)
+        } else {
+            listaVersiculos.add("Versículo não encontrado: $item")
+        }
+    }
+    return listaVersiculos.toList()
+}
+
+//Entradas: "PSA_1:1-6", "PSA_23, PSA_24:5"
+//Saida: "[PSA_1_1,PSA_1_2,PSA_1_3,PSA_1_4,PSA_1_5,PSA_1_6", "PSA_23, PSA_24_1, PSA_24_2, PSA_24_3, PSA_24_4, PSA_24_5]"
+fun getVersosFromReferenciaVersiculo(verso: String): List<String> {
+    val partes = verso.split("_")
+    val livro = partes[0]
+    val endereco = partes[1]
+
+    var versos = mutableListOf<String>()
+    if (endereco.contains(":")) {
+        val partesEndereco = endereco.split(":")
+        val capitulo = partesEndereco[0].toIntOrNull()
+        val intervalo = partesEndereco[1].split("-")
+        if (intervalo.size < 2) {
+            val versiculo = intervalo[0].toIntOrNull()
+            versos.add(livro + "_" + capitulo.toString() + "_" + versiculo.toString())
+        } else {
+            val inicio = intervalo[0].toIntOrNull()
+            val fim = intervalo[1].toIntOrNull()
+            for (versiculo in inicio!!..fim!!) {
+                versos.add(livro + "_" + capitulo.toString() + "_" + versiculo.toString())
+            }
+        }
+
+    } else {
+        val capitulo = endereco.toIntOrNull()
+        var cont = 1
+        var chave = livro + "_" + capitulo.toString() + "_" + cont.toString()
+        while (true) {
+            val texto = getTextoBiblicoFromJson(chave)
+            if (texto.isEmpty()) {
+                break
+            }
+            versos.add(chave)
+            cont++
+            chave = livro + "_" + capitulo.toString() + "_" + cont.toString()
+        }
+    }
+
+    return versos.toList()
+
+}
 
 
 
