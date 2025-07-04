@@ -545,28 +545,27 @@ fun getNomeLivroBibliaPorSigla(sigla: String): String {
     return livro
 }
 
-fun getTextoBiblicoFromJson(versiculo: String): String {
-    val jsonFile = File("res/blv.json").readText()
+fun getTextoBiblicoFromJson(context: android.content.Context, versiculo: String): String {
+    val inputStream = context.assets.open("blv.json")
+    // val inputStream = context.resources.openRawResource(R.raw.blv)
+
+
+    val jsonFile = inputStream.bufferedReader().use { it.readText() }
+    // val jsonFile = File("blv.json").readText()
     val mapa: Map<String, String> = Json.decodeFromString(jsonFile)
     val valor = mapa[versiculo] ?: "Versículo não encontrado"
     return valor
 }
 
-fun getVersiculosPorReferencia(versiculos: String): List<String> {
-    val partes = versiculos.split(",")
-    val listaVersiculos = mutableListOf<String>()
-    for (parte in partes) {
-        val versiculo = parte.trim()
-        val versiculosList = getVersosFromReferenciaVersiculo(versiculo)
-        listaVersiculos.addAll(getTextoFromReferenciaVersiculos(versiculosList))
-    }
-    return listaVersiculos.toList()
+fun getVersiculosPorReferencia(context: android.content.Context, versiculo: String): List<String> {
+        val versiculosList = getVersosFromReferenciaVersiculo(context,versiculo)
+        return getTextoFromReferenciaVersiculos(context,versiculosList)
 }
 
-fun getTextoFromReferenciaVersiculos(versos: List<String>): List<String> {
+fun getTextoFromReferenciaVersiculos(context: android.content.Context, versos: List<String>): List<String> {
     val listaVersiculos = mutableListOf<String>()
     for (item in versos) {
-        val texto = getTextoBiblicoFromJson(item)
+        val texto = getTextoBiblicoFromJson(context,item)
         if (texto.isNotEmpty()) {
             listaVersiculos.add(texto)
         } else {
@@ -578,7 +577,7 @@ fun getTextoFromReferenciaVersiculos(versos: List<String>): List<String> {
 
 //Entradas: "PSA_1:1-6", "PSA_23, PSA_24:5"
 //Saida: "[PSA_1_1,PSA_1_2,PSA_1_3,PSA_1_4,PSA_1_5,PSA_1_6", "PSA_23, PSA_24_1, PSA_24_2, PSA_24_3, PSA_24_4, PSA_24_5]"
-fun getVersosFromReferenciaVersiculo(verso: String): List<String> {
+fun getVersosFromReferenciaVersiculo(context: android.content.Context, verso: String): List<String> {
     val partes = verso.split("_")
     val livro = partes[0]
     val endereco = partes[1]
@@ -604,7 +603,7 @@ fun getVersosFromReferenciaVersiculo(verso: String): List<String> {
         var cont = 1
         var chave = livro + "_" + capitulo.toString() + "_" + cont.toString()
         while (true) {
-            val texto = getTextoBiblicoFromJson(chave)
+            val texto = getTextoBiblicoFromJson(context,chave)
             if (texto.isEmpty()) {
                 break
             }

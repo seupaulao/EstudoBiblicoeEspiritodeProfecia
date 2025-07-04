@@ -3,6 +3,8 @@ package com.pjlaapps.estudobiblicoeespiritodeprofecia
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -32,6 +34,7 @@ fun MonthButtonsScreen(
         Text(
             "Clique em um mês para ver os estudos disponíveis",
         )
+        Spacer(modifier = Modifier.height(15.dp))
         LazyColumn {
             fun LinhaMeses(lista: List<String>) {
                 item() {
